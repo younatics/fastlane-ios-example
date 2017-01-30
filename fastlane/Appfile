@@ -1,0 +1,5 @@
+app_identifier “YOUR_APP_IDENTIFIER”
+apple_id ENV["APPLE_ID"]
+
+team_id “YOUR_TEAM_ID”
+itc_team_id “YOUR_ITC_TEAM_ID”

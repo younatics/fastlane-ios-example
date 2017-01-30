@@ -1,0 +1,175 @@
+# Customise this file, documentation can be found here:
+# https://github.com/fastlane/fastlane/tree/master/fastlane/docs
+# All available actions: https://docs.fastlane.tools/actions
+# can also be listed using the `fastlane actions` command
+
+# Change the syntax highlighting to Ruby
+# All lines starting with a # are ignored when running `fastlane`
+
+#update_fastlane
+fastlane_version "2.9.0"
+
+default_platform :ios
+
+platform :ios do
+  before_all do
+    cocoapods
+
+  end
+
+# Beta Settings
+# Scheme: “DEBUG”
+  lane :beta do
+
+  ensure_git_status_clean
+
+# Change INFO_PLIST_PATH
+
+  checkNewVersionStart = get_info_plist_value(path: “INFO_PLIST_PATH”, key: "CFBundleVersion")
+  if checkNewVersionStart == "0"
+  increment_build_number(
+      build_number: "0"
+  )
+  end
+
+  formerNumber = get_build_number
+
+  increment_build_number
+  build_number = get_build_number
+  version = get_version_number
+
+  formerVersion = "#{version}-b#{formerNumber}”
+  commitVersion = "#{version}-b#{build_number}”
+
+  set_info_plist_value(path: “INFO_PLIST_PATH", key: "CFBundleVersion", value: build_number)
+
+  cert(
+    output_path: "fastlane/certificate"
+    )
+
+# adhoc needs to be true if you distribute with crashlytics
+
+  sigh(
+    adhoc: true,
+    force: true,
+    output_path: "fastlane/certificate"
+    )
+
+  pem(
+    output_path: "fastlane/certificate"
+  )
+
+# Change DEBUG_SCHEME, workspace
+  gym(scheme: “DEBUG_SCHEME”,
+      workspace: “APP.xcworkspace",
+      output_directory: “fastlane/ipa/“,
+      clean: true,
+      silent: true,
+      include_bitcode: false
+      )
+
+  commitMessage = changelog_from_git_commits(
+      pretty: "- %s",
+      between: ["v#{version}/iosbeta/#{formerVersion}", "HEAD"]
+      )
+
+# Change groups, DEBUG_SCHEME, CRASHLYTICS_API_TOEKN, CRASHLYTICS_BUILD_SECRET
+  crashlytics(
+      groups: "Testers",
+      notifications: true,
+      notes: "DEBUG_SCHEME\n#{commitMessage}",
+      ipa_path: "./fastlane/ipa/DEBUG_SCHEME.ipa",
+      api_token: “CRASHLYTICS_API_TOEKN”,
+      build_secret: "CRASHLYTICS_BUILD_SECRET”
+      )
+
+  commit_version_bump(
+      message: “Version #{commitVersion}”
+      )
+
+  add_git_tag(
+      grouping: “v#{version}”,
+      build_number: commitVersion
+      )
+
+  push_to_git_remote
+
+  end
+
+# Release Settings
+# Scheme: “RELEASE”
+
+  lane :release do
+
+    ensure_git_status_clean
+
+    checkNewVersionStart = get_info_plist_value(path: "INFO_PLIST_PATH", key: "CFBundleVersion")
+    if checkNewVersionStart == "0"
+    increment_build_number(
+        build_number: "0"
+    )
+    end
+
+    formerNumber = get_build_number
+
+    increment_build_number
+    build_number = get_build_number
+    version = get_version_number
+
+    formerVersion = "#{version}(#{formerNumber})”
+    commitVersion = "#{version}(#{build_number})”
+
+    set_info_plist_value(path: “INFO_PLIST_PATH", key: "CFBundleVersion", value: build_number)
+
+    cert(
+      output_path: "fastlane/certificate"
+      )
+
+# adhoc needs to be false if you distribute with test flight
+    sigh(
+      adhoc: false,
+      force: true,
+      output_path: "fastlane/certificate"
+      )
+
+    pem(
+      output_path: "fastlane/certificate"
+    )
+
+    gym(
+        scheme: “RELEASE_SCHEME”,
+        workspace: "APP.xcworkspace",
+        output_directory: “fastlane/ipa/“,
+        clean: true,
+        silent: true,
+        include_bitcode: false
+        )
+
+    commitMessage = changelog_from_git_commits(
+        pretty: "- %s",
+        between: ["v#{version}/iosRelease/#{formerVersion}", "HEAD"]
+        )
+
+    testflight(
+        changelog: "RELEASE_SCHEME\n#{commitMessage}"
+        )
+
+    commit_version_bump(
+        message: “Version #{commitVersion}”
+        )
+
+    add_git_tag(
+        grouping: “v#{version}”,
+        build_number: commitVersion
+        )
+
+    push_to_git_remote
+
+  end
+end
+
+# More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
+# All available actions: https://docs.fastlane.tools/actions
+
+# fastlane reports which actions are used
+# No personal data is recorded. Learn more at https://github.com/fastlane/enhancer
