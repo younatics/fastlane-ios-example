@@ -2,10 +2,11 @@
 ## Fastlane iOS Example for Beta, Release
 
 ### Simple Descriptions
-* Automatically distribute Crashlytics in Beta, Tesflight in Release
+* Compatibility with two differnt scheme (debug, release)
+* Automatically distribute Crashlytics in Beta, Tesflight in Release using Development provisioning in beta, Distribute provisioning in release
 * Automatically increment build number (eg.4.10.19/iosbeta/4.10.19(3) -> 4.10.19/iosbeta/4.10.19(4))
 * If you want to increment version number, use `increment_version_number`
-* Make git tag group with your build version (eg. 4.10.19/iosbeta/4.10.19(3)) if you distribute with fastlane
+* Automatically make git tag group with your build version (eg. 4.10.19/iosbeta/4.10.19(3)) if you distribute with fastlane
 * Get commit message between former version tag and HEAD
 
 ### Used Features
