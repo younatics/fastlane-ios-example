@@ -14,14 +14,13 @@ default_platform :ios
 platform :ios do
   before_all do
     cocoapods
+    ensure_git_status_clean
 
   end
 
 # Beta Settings
 # Scheme: “DEBUG”
   lane :beta do
-
-  ensure_git_status_clean
 
 # Change INFO_PLIST_PATH
 
@@ -44,13 +43,14 @@ platform :ios do
   set_info_plist_value(path: “INFO_PLIST_PATH", key: "CFBundleVersion", value: build_number)
 
   cert(
+    development: true,
     output_path: "fastlane/certificate"
     )
 
 # adhoc needs to be true if you distribute with crashlytics
 
   sigh(
-    adhoc: true,
+    development: true,
     force: true,
     output_path: "fastlane/certificate"
     )
@@ -101,8 +101,6 @@ platform :ios do
 
   lane :release do
 
-    ensure_git_status_clean
-
     checkNewVersionStart = get_info_plist_value(path: "INFO_PLIST_PATH", key: "CFBundleVersion")
     if checkNewVersionStart == "0"
     increment_build_number(
@@ -122,12 +120,13 @@ platform :ios do
     set_info_plist_value(path: “INFO_PLIST_PATH", key: "CFBundleVersion", value: build_number)
 
     cert(
+      development: false
       output_path: "fastlane/certificate"
       )
 
 # adhoc needs to be false if you distribute with test flight
     sigh(
-      adhoc: false,
+      development: false,
       force: true,
       output_path: "fastlane/certificate"
       )
