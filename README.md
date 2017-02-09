@@ -2,7 +2,7 @@
 ## Fastlane iOS Example for Beta, Release
 
 ### Simple Descriptions
-* Compatibility with two differnt scheme (debug, release)
+* Compatibility with two different scheme (debug, release)
 * Automatically distribute Crashlytics in Beta, Tesflight in Release using Development provisioning in beta, Distribute provisioning in release
 * Automatically increment build number (e.g.4.10.19/iosbeta/4.10.19(3) -> 4.10.19/iosbeta/4.10.19(4))
 * If you want to increment version number, use `increment_version_number`
