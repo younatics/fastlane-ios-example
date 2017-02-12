@@ -1,4 +1,3 @@
-# fastlane-ios-example
 ## Fastlane iOS Example for Beta, Release
 
 ### Simple Descriptions
